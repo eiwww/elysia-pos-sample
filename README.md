@@ -1,6 +1,5 @@
 # Elysia with Bun runtime
 # POS sample
-## Getting Started
 To get started with this template, install the package with this command into your terminal:
 ```bash
 bun i
