@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  name            String
+  username        String    @unique
+  password        String
+  role            String    @default("cashier") // e.g., 'cashier', 'manager', 'admin'
+  profileImageUrl String?
+  telephone       String?
+  email           String?   @unique
+  sales           Sale[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int
+  imageUrl    String?
+  salesItems  SaleItem[]
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  categoryId  Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String?   @unique
+  phone     String?
+  sales     Sale[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Sale {
+  id         Int        @id @default(autoincrement())
+  user       User       @relation(fields: [userId], references: [id])
+  userId     Int
+  customer   Customer?  @relation(fields: [customerId], references: [id])
+  customerId Int?
+  saleItems  SaleItem[]
+  total      Float
+  paid       Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+}
+
+model SaleItem {
+  id        Int       @id @default(autoincrement())
+  sale      Sale      @relation(fields: [saleId], references: [id])
+  saleId    Int
+  product   Product   @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Float // price at the time of sale
+  deletedAt DateTime?
+}
